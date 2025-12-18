@@ -1,163 +1,85 @@
-#include <iostream>
+# **🎓 StudentManagerSystem**
 
-const unsigned short CONSTANT1 = 11;
-const unsigned short CONSTANT2 = 30;
-const unsigned short CONSTANT3 = 10;
+Система за управление на студентски данни  
+Конзолно приложение, разработено на C++
 
-FILE* file = nullptr;   
+## **📖 Описание на проекта**
 
-struct Student {
-    char name[CONSTANT2];
-    char EGN[CONSTANT1];
-    char fNum[CONSTANT1];
-    float grades[CONSTANT1];
-    float avGrade = 0;
+**StudentManagerSystem** е конзолно приложение, предназначено за администриране на академична информация за студенти. Системата позволява на преподаватели или администратори да въвеждат лични данни и оценки, да изчисляват среден успех и да генерират справки за представянето на студентите.
+
+Приложението използва динамично заделяне на памет за оптимизирана работа с различен брой студенти и поддържа файлова операция за експорт на данните.
+
+## **🛠 Функционалности**
+
+Системата предлага интерактивно меню със следните възможности:
+
+1. 📝 **Въвеждане на данни**  
+   * Име и Фамилия  
+   * ЕГН (с валидация за дължина)  
+   * Факултетен номер  
+   * 10 оценки (по шестобалната система 2-6)  
+2. 💾 **Експорт към файл**  
+   * Създава текстов файл (students.txt) с пълната информация за въведените студенти.  
+3. 📊 **Академични справки**  
+   * Изчисляване и визуализиране на **среден успех** за всеки студент.  
+   * Филтриране на студенти, които имат **не повече от 2 слаби оценки** (позволява бързо идентифициране на успешно справящите се).  
+4. 🛡️ **Валидация**  
+   * Проверка за коректност на ЕГН.  
+   * Проверка дали оценките са в допустимия диапазон (2.00 \- 6.00).
+
+## **🏗 Техническа реализация**
+
+Проектът е написан на **C++** и използва процедурен стил на програмиране.
+
+### **Структури от данни**
+
+Основната единица данни е структурата Student:
+
+struct Student {  
+    char name\[30\];      // Имена на студента  
+    char EGN\[11\];       // ЕГН  
+    char fNum\[11\];      // Факултетен номер  
+    float grades\[10\];   // Масив с оценки  
+    float avGrade;      // Среден успех (калкулиран)  
 };
 
-bool readStudentsData(unsigned short studentsCount, Student* allStudents) {
-    Student curStudent;
-    for (unsigned short i = 0; i < studentsCount; i++) {
-        printf("Student %d \n", i + 1);
+### **Ключови алгоритми**
 
-        printf("Write Student Name (First and Last Name): ");
-        getchar();
-        gets_s(curStudent.name, CONSTANT2);
+* **Динамична памет:** Използва се new и delete\[\] за управление на масива от студенти според въведения брой.  
+* **Secure Input:** Използват се "secure" версиите на C-функциите (scanf\_s, gets\_s, fopen\_s), което прави кода по-устойчив на препълване на буфера (Buffer Overflow), но го прави специфичен за Microsoft Visual C++ компилатори.
 
-        printf("Write Student EGN: ");
-        gets_s(curStudent.EGN, CONSTANT1);
-        if (strlen(curStudent.EGN) < CONSTANT3) {
-            return false;
-        }
-        
+## **🚀 Как да стартирате проекта**
 
-        printf("Write Student Faculty Number: ");
-        scanf_s("%s", curStudent.fNum, CONSTANT1);
+⚠️ **Важно:** Този код използва Microsoft-specific функции (\_s suffix). За да компилирате успешно, се препоръчва използването на **Visual Studio**.
 
-        float gradesSum = 0;
-        for (unsigned short i = 0; i < CONSTANT3; i++) {
-            printf("   %d. Grade (2-6): ", i + 1);
-            scanf_s("%f", &curStudent.grades[i]);
-            if (curStudent.grades[i] > 6 || curStudent.grades[i] < 2) {
-                return false;
-            }
-            gradesSum += curStudent.grades[i];
-        }
-        printf("\n");
+1. Клонирайте хранилището или изтеглете файла .cpp.  
+2. Отворете **Visual Studio** и създайте нов **C++ Console Project**.  
+3. Поставете кода в основния .cpp файл.  
+4. Компилирайте и стартирайте с Ctrl \+ F5.
 
-        curStudent.avGrade = gradesSum / 10;
-        allStudents[i] = curStudent;
-    }
+### **Ако използвате GCC/Clang (Linux/macOS):**
 
-    printf("\n\n");
-    return true;
-}
+Ще трябва да замените специфичните функции със стандартни:
 
-void createStudentsFile(unsigned short studentsCount, Student* allStudents) {
-    errno_t err = fopen_s(&file, "students.txt", "w+t"); 
-    if (err != 0) {
-        printf("Error opening file!\n");
-        return;
-    }
+* scanf\_s ➡️ scanf  
+* gets\_s ➡️ fgets (препоръчително)  
+* fopen\_s ➡️ fopen
 
-    for (unsigned short i = 0; i < studentsCount; i++) {
-        printf("Name: %s\n", allStudents[i].name);
-        fprintf(file, "Name: %s\n", allStudents[i].name);
+## **📂 Файлова структура**
 
-        printf("EGN: %s\n", allStudents[i].EGN);
-        fprintf(file, "EGN: %s\n", allStudents[i].EGN);
+При успешно изпълнение на опция **1** от менюто, приложението генерира файл със следната структура:
 
-        printf("Faculty Number: %s\n", allStudents[i].fNum);
-        fprintf(file, "Faculty Number: %s\n", allStudents[i].fNum);
+**students.txt:**
 
-        for (unsigned short j = 0; j < CONSTANT3; j++) {
-            printf("    %d. %.2f\n", j+1, allStudents[i].grades[j]);
-            fprintf(file, "    %d. %.2f\n", j + 1, allStudents[i].grades[j]);
-        }
+Name: Ivan Ivanov  
+EGN: 1234567890  
+Faculty Number: 121212  
+    1\. 6.00  
+    2\. 5.50  
+    ...
 
-        printf("\n");
-        fprintf(file, "\n");
-    }
+## **📄 Лиценз**
 
-    fclose(file);
-}
+Този проект е с учебна цел и е свободен за ползване.
 
-void studentsAverageGrades(unsigned short studentsCount, Student* allStudents) {
-    for (unsigned short i = 0; i < studentsCount; i++) {
-        printf("Name: %s - ", allStudents[i].name);
-        printf("Faculty Number: %s - ", allStudents[i].fNum);
-        printf("Average Grade: %.2f\n", allStudents[i].avGrade);
-        printf("\n");
-    }
-}
-
-void allStudentsWithMoreThanTwoFailGrades(unsigned short studentsCount, Student* allStudents) {
-    unsigned short failGradeSum = 0;
-    for (unsigned short i = 0; i < studentsCount; i++) {
-        for (unsigned short j = 0; j < CONSTANT3; j++) {
-            if (allStudents[i].grades[j] == 2) {
-                failGradeSum++;
-            }
-        }
-
-        if (failGradeSum <= 2) {
-            printf("Faculty Number: %s\n", allStudents[i].fNum);
-            printf("\n");
-        }
-
-        failGradeSum = 0;
-    }
-}
-
-bool menu(unsigned short studentsCount, Student* allStudents) {
-    unsigned short option = 0;
-    while (true) {
-        printf("---Menu---\n");
-        printf("1. Create file with information about students\n");
-        printf("2. Average grade of every student\n");
-        printf("3. All students with not more than 2 Fail grades\n");
-        printf("4. Quit\n");
-        printf("Choose (1-4): ");
-        scanf_s("%hd", &option);
-        printf("\n");
-
-        switch (option) {
-        case 1:
-            createStudentsFile(studentsCount, allStudents);
-            break;
-        case 2:
-            studentsAverageGrades(studentsCount, allStudents);
-            break;
-        case 3:
-            allStudentsWithMoreThanTwoFailGrades(studentsCount, allStudents);
-            break;
-        case 4:
-            printf("Bye! Bye!\n");
-            exit(0);
-        default:
-            return false;
-        }
-        option = 0;
-    }
-}
-
-int main()
-{
-    unsigned short studentsCount = 0;
-
-    printf("----------StudentsManagerSystem----------\n");
-    printf("Write Students Count (1-200): ");
-    scanf_s("%hd", &studentsCount);
-    if (studentsCount == 0) {
-        printf("Incorrect data! Try again!");
-        return 0;
-    }
-    printf("\n");
-   
-    Student* allStudents = new Student[studentsCount];
-    if (!readStudentsData(studentsCount, allStudents) || !menu(studentsCount, allStudents)) {
-        printf("Incorrect data! Try again!");
-        return 0;
-    }
-    
-    delete[] allStudents;
-}
+Автор: Владимир Иванов
